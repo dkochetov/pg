@@ -36,6 +36,22 @@ Pg.prototype.extend = function(){
     return pgElement.prototype;
 }
 
+Pg.prototype.get = function(prop){
+    return this[prop];
+}
+Pg.prototype.set = function(prop, value){
+    if(prop in this){
+        if(this.get(prop) !== value){
+            this[prop] = value;
+            this.event['change:' + prop]();
+        }
+    }
+}
+Pg.prototype.bind = function(event, callback){
+    this.event = this.event || {};
+    this.event[event] = callback;
+}
+
 fn = {
     el: function(selector){
         if(selector){
