@@ -31,8 +31,8 @@ Pg.prototype.extend = function(){
     var pgElement = function () {Parent.apply(this, arguments);};
 
     pgElement.prototype = Object.create(Parent.prototype);
-    pgElement.prototype.constructor = pgElement;
     addProp.apply(pgElement.prototype, arguments);
+
     return pgElement.prototype;
 }
 
@@ -43,7 +43,22 @@ Pg.prototype.set = function(prop, value){
     if(prop in this){
         if(this.get(prop) !== value){
             this[prop] = value;
-            this.event['change:' + prop]();
+            if(this.event){
+                if(typeof this.event['change:' + prop] === 'function'){
+                    this.event['change:' + prop].call(this, value);
+                    if(this.eventOne && ('change:' + prop) in this.eventOne){
+                        delete this.event['change:' + prop];
+                        delete this.eventOne['change:' + prop];
+                    }
+                }
+                if(typeof this.event['change'] === 'function'){
+                    this.event['change'].call(this, prop, value);
+                    if(this.eventOne && ('change') in this.eventOne){
+                        delete this.event['change'];
+                        delete this.eventOne['change'];
+                    }
+                }
+            }
         }
     }
 }
@@ -51,7 +66,16 @@ Pg.prototype.bind = function(event, callback){
     this.event = this.event || {};
     this.event[event] = callback;
 }
-
+Pg.prototype.off = function(event){
+    if(this.event && event in this.event) delete this.event[event]
+    if(this.eventOne && event in this.eventOne) delete this.eventOne[event];
+}
+Pg.prototype.one = function(event, callback){
+    this.event = this.event || {};
+    this.eventOne = this.eventOne || {};
+    this.event[event] = callback;
+    this.eventOne[event] = true;
+}
 fn = {
     el: function(selector){
         if(selector){
