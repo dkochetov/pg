@@ -22,7 +22,7 @@ function addProp(){
     if(this.init && typeof this.init === 'function'){
         this.init();
     }
-};
+}
 
 Pg.prototype.extend = function(){
     if(!arguments.length) return;
@@ -34,11 +34,12 @@ Pg.prototype.extend = function(){
     addProp.apply(pgElement.prototype, arguments);
 
     return pgElement.prototype;
-}
+};
 
 Pg.prototype.get = function(prop){
     return this[prop];
-}
+};
+
 Pg.prototype.set = function(prop, value){
     if(prop in this){
         if(this.get(prop) !== value){
@@ -61,21 +62,25 @@ Pg.prototype.set = function(prop, value){
             }
         }
     }
-}
+};
+
+Pg.prototype.event = {};
+Pg.prototype.eventOne = {};
+
 Pg.prototype.bind = function(event, callback){
-    this.event = this.event || {};
     this.event[event] = callback;
-}
+};
+
 Pg.prototype.off = function(event){
-    if(this.event && event in this.event) delete this.event[event]
+    if(this.event && event in this.event) delete this.event[event];
     if(this.eventOne && event in this.eventOne) delete this.eventOne[event];
-}
+};
+
 Pg.prototype.one = function(event, callback){
-    this.event = this.event || {};
-    this.eventOne = this.eventOne || {};
     this.event[event] = callback;
     this.eventOne[event] = true;
-}
+};
+
 fn = {
     el: function(selector){
         if(selector){
